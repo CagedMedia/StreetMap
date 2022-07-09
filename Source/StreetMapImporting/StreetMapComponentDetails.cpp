@@ -1,27 +1,22 @@
 // Copyright 2017 Mike Fricker. All Rights Reserved.
 
-#include "StreetMapImporting.h"
-
 #include "StreetMapComponentDetails.h"
-
-#include "SlateBasics.h"
-#include "RawMesh.h"
-#include "PropertyEditorModule.h"
-#include "DetailLayoutBuilder.h"
-#include "DetailCategoryBuilder.h"
-#include "DetailWidgetRow.h"
-#include "PropertyCustomizationHelpers.h"
-#include "IDetailsView.h"
-#include "IDetailCustomization.h"
+#include "AssetToolsModule.h"
 #include "AssetRegistryModule.h"
-#include "DlgPickAssetPath.h"
+#include "DetailCategoryBuilder.h"
+#include "DetailLayoutBuilder.h"
+#include "DetailWidgetRow.h"
 #include "IDetailCustomization.h"
-#include "SNotificationList.h"
-#include "NotificationManager.h"
-#include "AssertionMacros.h"
-
-
+#include "IDetailsView.h"
+#include "PropertyCustomizationHelpers.h"
+#include "RawMesh.h"
+#include "SlateBasics.h"
 #include "StreetMapComponent.h"
+#include "StreetMapImporting.h"
+#include "Dialogs/DlgPickAssetPath.h"
+#include "Framework/Notifications/NotificationManager.h"
+#include "Misc/AssertionMacros.h"
+#include "Widgets/Notifications/SNotificationList.h"
 
 
 #define LOCTEXT_NAMESPACE "StreetMapComponentDetails"
@@ -241,7 +236,7 @@ FReply FStreetMapComponentDetails::OnCreateStaticMeshAssetClicked()
 			// Copy verts
 			for (int32 VertIndex = 0; VertIndex < RawMeshVertices.Num();VertIndex++)
 			{
-				RawMesh.VertexPositions.Add(RawMeshVertices[VertIndex].Position);
+				RawMesh.VertexPositions.Add(FVector3f(RawMeshVertices[VertIndex].Position));
 			}
 
 			// Copy 'wedge' info
@@ -258,11 +253,11 @@ FReply FStreetMapComponentDetails::OnCreateStaticMeshAssetClicked()
 				FVector TangentZ = StreetMapVertex.TangentZ;
 				FVector TangentY = (TangentX ^ TangentZ).GetSafeNormal();
 
-				RawMesh.WedgeTangentX.Add(TangentX);
-				RawMesh.WedgeTangentY.Add(TangentY);
-				RawMesh.WedgeTangentZ.Add(TangentZ);
+				RawMesh.WedgeTangentX.Add(FVector3f(TangentX));
+				RawMesh.WedgeTangentY.Add(FVector3f(TangentY));
+				RawMesh.WedgeTangentZ.Add(FVector3f(TangentZ));
 
-				RawMesh.WedgeTexCoords[0].Add(StreetMapVertex.TextureCoordinate);
+				RawMesh.WedgeTexCoords[0].Add(FVector2f(StreetMapVertex.TextureCoordinate));
 				RawMesh.WedgeColors.Add(StreetMapVertex.Color);
 			}
 
@@ -285,10 +280,11 @@ FReply FStreetMapComponentDetails::OnCreateStaticMeshAssetClicked()
 				UStaticMesh* StaticMesh = NewObject<UStaticMesh>(Package, MeshName, RF_Public | RF_Standalone);
 				StaticMesh->InitResources();
 
-				StaticMesh->LightingGuid = FGuid::NewGuid();
+				StaticMesh->SetLightingGuid( FGuid::NewGuid());
 
 				// Add source to new StaticMesh
-				FStaticMeshSourceModel* SrcModel = new (StaticMesh->SourceModels) FStaticMeshSourceModel();
+				FStaticMeshSourceModel* SrcModel = new FStaticMeshSourceModel();//&StaticMesh->GetSourceModel(0);
+				//FStaticMeshSourceModel* SrcModel = new (StaticMesh->GetSourceModels()) FStaticMeshSourceModel();
 				SrcModel->BuildSettings.bRecomputeNormals = false;
 				SrcModel->BuildSettings.bRecomputeTangents = false;
 				SrcModel->BuildSettings.bRemoveDegenerates = false;
@@ -302,7 +298,9 @@ FReply FStreetMapComponentDetails::OnCreateStaticMeshAssetClicked()
 				// Copy materials to new mesh
 				for (UMaterialInterface* Material : MeshMaterials)
 				{
-					StaticMesh->StaticMaterials.Add(FStaticMaterial(Material));
+					auto mats = StaticMesh->GetStaticMaterials();
+					mats.Add(FStaticMaterial(Material));
+					StaticMesh->SetStaticMaterials(mats);
 				}
 
 				//Set the Imported version before calling the build
@@ -324,7 +322,7 @@ FReply FStreetMapComponentDetails::OnCreateStaticMeshAssetClicked()
 					FNotificationInfo Info(FText::Format(LOCTEXT("StreetMapMeshConverted", "Successfully Converted Mesh"), FText::FromString(StaticMesh->GetName())));
 					Info.ExpireDuration = 8.0f;
 					Info.bUseLargeFont = false;
-					Info.Hyperlink = FSimpleDelegate::CreateLambda([=]() { FAssetEditorManager::Get().OpenEditorForAssets(TArray<UObject*>({ StaticMesh })); });
+//					Info.Hyperlink = FSimpleDelegate::CreateLambda([=]() { FAssetEditorManager::Get().OpenEditorForAssets(TArray<UObject*>({ StaticMesh })); });
 					Info.HyperlinkText = FText::Format(LOCTEXT("OpenNewAnimationHyperlink", "Open {0}"), FText::FromString(StaticMesh->GetName()));
 					TSharedPtr<SNotificationItem> Notification = FSlateNotificationManager::Get().AddNotification(Info);
 					if (Notification.IsValid())

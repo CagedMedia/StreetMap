@@ -2,9 +2,8 @@
 
 #include "StreetMapImporting.h"
 #include "StreetMapAssetTypeActions.h"
-#include "ModuleManager.h"
-#include "StreetMapStyle.h"
 #include "StreetMapComponentDetails.h"
+#include "StreetMapStyle.h"
 
 
 class FStreetMapImportingModule : public IModuleInterface

@@ -2,12 +2,11 @@
 
 // Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
 
-#include "StreetMapImporting.h"
-#include "AssetData.h"
 #include "StreetMapActorFactory.h"
+#include "StreetMap.h"
 #include "StreetMapActor.h"
 #include "StreetMapComponent.h"
-#include "StreetMap.h"
+#include "StreetMapImporting.h"
 
 
 //////////////////////////////////////////////////////////////////////////

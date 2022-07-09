@@ -21,7 +21,6 @@
 			"Type" : "Runtime",
 			"LoadingPhase" : "Default"
 		},
-	
 		{
 			"Name" : "StreetMapImporting",
 			"Type" : "Editor",

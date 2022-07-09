@@ -1,9 +1,10 @@
 // Copyright 2017 Mike Fricker. All Rights Reserved.
 
-#include "StreetMapImporting.h"
 #include "StreetMapStyle.h"
-#include "SlateStyle.h"
-#include "IPluginManager.h"
+
+#include "Interfaces/IPluginManager.h"
+#include "Styling/SlateStyle.h"
+#include "StreetMapImporting.h"
 
 #define IMAGE_BRUSH( RelativePath, ... ) FSlateImageBrush( FStreetMapStyle::InContent( RelativePath, ".png" ), __VA_ARGS__ )
 

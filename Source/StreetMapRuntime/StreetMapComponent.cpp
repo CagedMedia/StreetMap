@@ -1,7 +1,9 @@
 // Copyright 2017 Mike Fricker. All Rights Reserved.
 
-#include "StreetMapRuntime.h"
 #include "StreetMapComponent.h"
+
+#include "NavigationSystem.h"
+#include "StreetMapRuntime.h"
 #include "StreetMapSceneProxy.h"
 #include "Runtime/Engine/Classes/Engine/StaticMesh.h"
 #include "Runtime/Engine/Public/StaticMeshResources.h"
@@ -10,7 +12,6 @@
 #include "PhysicsEngine/BodySetup.h"
 
 #if WITH_EDITOR
-#include "ModuleManager.h"
 #include "PropertyEditorModule.h"
 #endif //WITH_EDITOR
 
@@ -101,7 +102,7 @@ bool UStreetMapComponent::GetPhysicsTriMeshData(struct FTriMeshCollisionData* Co
 
 	for (int32 VertexIndex = 0; VertexIndex < NumVertices; VertexIndex++)
 	{
-		CollisionData->Vertices[VertexIndex] = Vertices[VertexIndex].Position;
+		CollisionData->Vertices[VertexIndex] = FVector3f(Vertices[VertexIndex].Position);
 	}
 
 	// Copy indices data
@@ -516,7 +517,7 @@ void UStreetMapComponent::UpdateNavigationIfNeeded()
 {
 	if (bCanEverAffectNavigation || bNavigationRelevant)
 	{
-		UNavigationSystem::UpdateComponentInNavOctree(*this);
+		UNavigationSystemV1::UpdateComponentInNavOctree(*this);
 	}
 }
 

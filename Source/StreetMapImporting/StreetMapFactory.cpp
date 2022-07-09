@@ -1,9 +1,9 @@
 // Copyright 2017 Mike Fricker. All Rights Reserved.
 
-#include "StreetMapImporting.h"
 #include "StreetMapFactory.h"
 #include "OSMFile.h"
 #include "StreetMap.h"
+#include "StreetMapImporting.h"
 
 
 // Latitude/longitude scale factor

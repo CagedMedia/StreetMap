@@ -1,7 +1,7 @@
 // Copyright 2017 Mike Fricker. All Rights Reserved.
 
-#include "StreetMapRuntime.h"
 #include "StreetMapSceneProxy.h"
+#include "StreetMapRuntime.h"
 #include "StreetMapComponent.h"
 #include "Runtime/Engine/Public/SceneManagement.h"
 
@@ -33,9 +33,9 @@ void FStreetMapSceneProxy::Init(const UStreetMapComponent* InComponent, const TA
 	{
 		const FStreetMapVertex& StreetMapVert = Vertices[VertIdx];
 		FDynamicMeshVertex& Vert = DynamicVertices[VertIdx];
-		Vert.Position = StreetMapVert.Position;
+		Vert.Position = FVector3f(StreetMapVert.Position);
 		Vert.Color = StreetMapVert.Color;
-		Vert.TextureCoordinate[0] = StreetMapVert.TextureCoordinate;
+		Vert.TextureCoordinate[0] = FVector2f(StreetMapVert.TextureCoordinate);
 		Vert.TangentX = StreetMapVert.TangentX;
 		Vert.TangentZ = StreetMapVert.TangentZ;
 	}
@@ -132,11 +132,12 @@ void FStreetMapSceneProxy::MakeMeshBatch( FMeshBatch& Mesh, FMaterialRenderProxy
 	{
 		if (bDrawCollision)
 		{
-			MaterialProxy = new FColoredMaterialRenderProxy(GEngine->ShadedLevelColorationUnlitMaterial->GetRenderProxy(IsSelected(), IsHovered()), FColor::Cyan);
+			MaterialProxy = new FColoredMaterialRenderProxy(
+				GEngine->ShadedLevelColorationUnlitMaterial->GetRenderProxy(/*IsSelected(), IsHovered()*/), FColor::Cyan);
 		}
 		else if (MaterialProxy == nullptr)
 		{
-			MaterialProxy = StreetMapComp->GetDefaultMaterial()->GetRenderProxy(IsSelected());
+			MaterialProxy = StreetMapComp->GetDefaultMaterial()->GetRenderProxy(/*IsSelected()*/);
 		}
 	}
 	
@@ -146,7 +147,7 @@ void FStreetMapSceneProxy::MakeMeshBatch( FMeshBatch& Mesh, FMaterialRenderProxy
 	Mesh.VertexFactory = &VertexFactory;
 	Mesh.MaterialRenderProxy = MaterialProxy;
 	Mesh.CastShadow = true;
-	BatchElement.PrimitiveUniformBuffer = CreatePrimitiveUniformBufferImmediate(GetLocalToWorld(), GetBounds(), GetLocalBounds(), true, UseEditorDepthTest());
+	BatchElement.PrimitiveUniformBuffer = CreatePrimitiveUniformBufferImmediate(GetLocalToWorld(), GetBounds(), GetLocalBounds(), GetLocalBounds(), true,DrawsVelocity());
 	BatchElement.FirstIndex = 0;
 	const int IndexCount = IndexBuffer32.Indices.Num();
 	BatchElement.NumPrimitives = IndexCount / 3;
@@ -183,7 +184,7 @@ void FStreetMapSceneProxy::GetDynamicMeshElements(const TArray<const FSceneView*
 
 			const bool bIsWireframe = AllowDebugViewmodes() && View.Family->EngineShowFlags.Wireframe;
 
-			FColoredMaterialRenderProxy* WireframeMaterialRenderProxy = GEngine->WireframeMaterial && bIsWireframe ? new FColoredMaterialRenderProxy(GEngine->WireframeMaterial->GetRenderProxy(IsSelected()), FLinearColor(0, 0.5f, 1.f)) : NULL;
+			FColoredMaterialRenderProxy* WireframeMaterialRenderProxy = GEngine->WireframeMaterial && bIsWireframe ? new FColoredMaterialRenderProxy(GEngine->WireframeMaterial->GetRenderProxy(/*IsSelected()*/), FLinearColor(0, 0.5f, 1.f)) : NULL;
 
 
 			if (MustDrawMeshDynamically(View))

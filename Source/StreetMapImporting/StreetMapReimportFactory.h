@@ -1,8 +1,8 @@
 // Copyright 2017 Mike Fricker. All Rights Reserved.
 #pragma once
 
-#include "StreetMapFactory.h"
 #include "EditorReimportHandler.h"
+#include "StreetMapFactory.h"
 #include "StreetMapReimportFactory.generated.h"
 
 

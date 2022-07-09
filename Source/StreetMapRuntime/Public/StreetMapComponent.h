@@ -2,9 +2,9 @@
 #pragma once
 
 #include "StreetMap.h"
+#include "StreetMapRuntime/StreetMapSceneProxy.h"
 #include "Components/MeshComponent.h"
 #include "Interfaces/Interface_CollisionDataProvider.h"
-#include "StreetMapSceneProxy.h"
 #include "StreetMapComponent.generated.h"
 
 
